@@ -1,0 +1,98 @@
+# How this project is built
+
+Every piece of work goes from a GitHub issue to a merged pull request through the same steps. AI
+agents do most of the writing, testing and reviewing, and the owner decides at fixed points. This
+page explains each step, who does it, and how it maps to the roles of a usual software team. The
+rules themselves are in [`AGENTS.md`](../AGENTS.md) and the skills under
+[`.agents/skills/`](../.agents/skills/); the process comes from the template named in
+`.copier-answers.yml`.
+
+## The steps, start to finish
+
+| # | Step | What happens | Who does it | Usual role | Gate |
+|---|---|---|---|---|---|
+| 1 | Product definition | What the product must do, and in which milestone | Owner, with the manager session | Product owner, business analyst | **Owner** |
+| 2 | Backlog | A GitHub issue with a rating (red, yellow, green or chore), "blocked by" links, and the spec capabilities and ADR number it will take | Manager session | Project manager | **Owner:** what comes next |
+| 3 | Design, point by point | For each point: what it means, the alternatives with merits and drawbacks, one recommendation, mockups for any screen. The agreed design goes into the issue | Manager proposes, owner decides | Business analyst, architect, UX designer | **Owner:** each point |
+| 4 | Start the build | A session in its own worktree and branch from `main`, in a mode: autopilot, build or learning | Manager session, or a developer | Tech lead | **Owner:** the mode |
+| 5 | Planning (OpenSpec) | Proposal (why, what), specs with Gherkin scenarios that run as acceptance tests, design and ADRs (how), tasks | Build session | BA, test lead, architect, tech lead | **Owner:** proposal, specs, ADRs. **Developer:** design, tasks |
+| 6 | Draft pull request | One PR per change, opened when the planning is approved | Build session | Tech lead | — |
+| 7 | Build (outside-in TDD) | Failing acceptance scenarios first, then unit tests and code until they pass: red, green, refactor | `senior-qa`, `senior-dev`, or the developer | QA automation, developer | — in autopilot |
+| 8 | Continuous integration | Lint, types, unit and acceptance tests, spec validation, dependency audit, at two or three agreed push points | CI | DevOps | — |
+| 9 | Verification | For UI: an independent verifier checks the real pages at {{ ui_verifier_width }} px against the issue's checklist. A code review by a different model covers security, permissions, data, server logic. Findings sorted into three levels; at most three rounds | Verifier, reviewer | QA tester, peer and security reviewer | Adversarial review only if the owner agrees |
+| 10 | Demo | Review videos of the working flow, in journey order | Build session | Sprint review | **Owner:** watches them |
+| 11 | Close the specs | `openspec verify`, then archive: the change's specs join `openspec/specs/`, the living description of the product | Build session | Technical writer | — |
+| 12 | Merge | Checked against the issue point by point, then merged with a merge commit | Owner | Release manager | **Owner** |
+| 13 | Learning | Lessons go back into the template, so every project gains them | Everyone | Retrospective | — |
+
+## Who decides what
+
+| Decision | Who | Recorded in |
+|---|---|---|
+| Scope, what comes next, milestones | Owner | The issue and its rating |
+| The design: behaviour, screens, security choices | Owner, point by point | The issue's agreed design |
+| The proposal and specs: what the change does | Owner | The change's first commits |
+| A lasting technical choice: a new dependency, pattern or data layout | Developer proposes, owner decides | An ADR |
+| The technical design inside the agreed design | The developer running the build | `design.md`, `tasks.md` |
+| Code, tests, refactoring | The developer and their agent | Commits |
+| The merge | Owner | A merge commit |
+
+A product question the agreed design does not answer goes to the owner as a comment on the issue,
+never decided in code. Its answer is added to the issue's design, so the next agent sees it.
+
+## Modes
+
+| Mode | The build stops for you… | Use it when |
+|---|---|---|
+| Autopilot | at the planning approval and at the end | The design is settled and you want speed |
+| Build | at each step: every planning artifact, each test | You want to steer as it goes |
+| Learning | at each step and before every command, explaining it | You are new to the code or the method |
+
+## Review findings
+
+| Level | Meaning | What happens |
+|---|---|---|
+| 1 | Breaks core functionality: wrong results, data loss, a security hole | Fixed now |
+| 2 | Plausible in real use, limited impact | Fixed if cheap, otherwise one issue for all of them |
+| 3 | Rare or theoretical | One line in the PR under "Deliberately not handled" |
+
+## A developer's change, step by step
+
+1. Pick a ready issue: open, nobody assigned, no open blocker, with an agreed design. Start small.
+2. Assign it to yourself, and make its worktree from `main`, with its own ports and database.
+3. Start your agent in the worktree: "work on issue <n> in learning mode" while you are new to the
+   code, build mode after that.
+4. Your agent drafts the proposal and specs; ask the owner on the PR to approve them. You approve
+   the design and tasks, unless they need an ADR.
+5. Approve each batch of tests and code. Technical questions are yours; product questions go to
+   the owner on the issue.
+6. Run the same checks as CI, then the review. UI work also takes the independent verifier and
+   the review videos.
+7. Archive the change, then ask the owner to merge.
+
+## Which SDLC this is
+
+- **Agile, closest to Kanban:** work is pulled one issue at a time per worker, with no fixed
+  sprints; milestones act as release goals.
+- **Each issue is a small V-model:** requirements and scenarios are proved by acceptance tests;
+  the design by review and the verifier; the code by unit tests, types and mutation testing.
+- **Spec-driven, with BDD and TDD:** the spec is the source of truth, its scenarios run as tests,
+  and tests are written before code.
+- **Rules checked by machines where they can be:** each project convention names the check that
+  enforces it, so reviews spend their time on what no check can see.
+
+## Glossary
+
+| Term | Meaning |
+|---|---|
+| Issue rating | Red: blocks other work. Yellow: needed soon. Green: can wait. Chore: upkeep with no feature. |
+| Worktree | A second working folder of the same repository, on its own branch. |
+| OpenSpec change | One unit of work: proposal, specs, design, tasks; then verify and archive. One issue, one PR. |
+| Delta spec | The part of a spec a change adds or modifies; merged into the living specs at archive. |
+| Gherkin | Given / When / Then scenarios in plain words, which also run as tests. |
+| ADR | Architecture decision record: one decision, its alternatives and its consequences. |
+| Outside-in TDD | Start from a failing acceptance test of what the user sees, then work inward. |
+| Manager session | The agent session on `main` that designs with the owner, files issues and starts builds. |
+| Build session | The agent session that carries one issue from planning to PR in its own worktree. |
+| Subagent | A helper a build session starts for one job (`senior-qa`, `senior-dev`, the verifier). |
+| Independent verifier | An agent that never saw the code, checking the real pages against the issue's checklist. |

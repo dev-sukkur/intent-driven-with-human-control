@@ -1,0 +1,12 @@
+# The owner reviews every change to the process and to how the project is built and shipped.
+# With branch protection's "Require review from Code Owners", these changes need the owner's
+# approval even when a developer approves the rest. Add the project's sensitive code below
+# (sign-in, permissions, migrations, payments).
+/AGENTS.md                  @{{ repo.split('/')[0] }}
+/CLAUDE.md                  @{{ repo.split('/')[0] }}
+/.copier-answers.yml        @{{ repo.split('/')[0] }}
+/.agents/                   @{{ repo.split('/')[0] }}
+/.claude/                   @{{ repo.split('/')[0] }}
+/.opencode/                 @{{ repo.split('/')[0] }}
+/openspec/config.yaml       @{{ repo.split('/')[0] }}
+/.github/                   @{{ repo.split('/')[0] }}
