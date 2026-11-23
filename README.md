@@ -1,8 +1,6 @@
 # Intent-Driven With Human Control
 
-A shared process template, forked from
-[siraj-samsudeen/intent-driven-with-human-control](https://github.com/siraj-samsudeen/intent-driven-with-human-control),
-which is the shared process template for Siraj's projects. That template starts from
+The shared process template for intent driven product development. It starts from
 [intent-driven-dev/intent-driven-template](https://github.com/intent-driven-dev/intent-driven-template)
 and changes it for Claude Code, with one change of philosophy: **the human approves every step
 that has something to decide**, and the git history records each step well enough that a
