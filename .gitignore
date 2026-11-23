@@ -22,6 +22,24 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+mutants/
+
+# Acceptance suite output (the acceptance-test-authoring skill)
+acceptance-tests/.extracted/
+acceptance-tests/reports/
+
 # Environment and local secrets
 .env
 .env.*
