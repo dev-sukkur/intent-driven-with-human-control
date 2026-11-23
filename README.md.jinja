@@ -1,0 +1,68 @@
+# {{ repo.split('/')[1] }}
+
+<!-- A starting point from the process template: replace each section's placeholder text. -->
+
+<One or two sentences: what this product is and who it is for.>
+
+**Status:** <early, in development, released>.
+
+## What it does
+
+- <the main things a person can do with it>
+
+## Built with
+
+| Part | Choice |
+|---|---|
+| Language | <language and version> |
+| Tests | {% if acceptance_stack == 'python' %}pytest; behave with Playwright for the acceptance suite{% else %}Bun's test runner; cucumber-js with Playwright for the acceptance suite{% endif %} |
+| Process | [OpenSpec](https://github.com/Fission-AI/OpenSpec) changes: spec-driven, outside-in TDD |
+
+Why each choice was made: [`{{ adr_dir }}/`]({{ adr_dir }}/).
+
+## Run it
+
+```sh
+git clone https://github.com/{{ repo }}.git
+<the commands that get it running>
+```
+
+## How it is built
+
+Every piece of work goes from a GitHub issue to a merged pull request through the same steps:
+
+1. The **owner** agrees the issue's design, point by point.
+2. A **developer**, with an AI agent, plans the change as an OpenSpec proposal, specs, design and
+   tasks. The owner approves the proposal and specs.
+3. The developer and the agent build it **test first**: failing acceptance scenarios, then unit
+   tests and code until they pass.
+4. CI runs every check. A **review** by a different model, and for screens an independent
+   verifier, checks what tests can't.
+5. The **owner** merges.
+
+The full walk-through, with each step mapped to the roles of a usual software team:
+[`docs/process.md`](docs/process.md).
+
+## Join the team
+
+The owner makes the product decisions; developers build, each with their own AI agent (Claude
+Code, Codex, OpenCode or another) in their own worktree.
+
+1. Pick a ready issue, a small one to start, and assign it to yourself.
+2. Start your agent in the issue's worktree in **learning mode**, which explains each step, or in
+   **build mode** once you know the code.
+3. Ask product questions on the issue; decide technical ones yourself.
+
+## Where things are
+
+| What | Where |
+|---|---|
+| What it does today | [`openspec/specs/`](openspec/specs/) |
+| Why it is built this way | [`{{ adr_dir }}/`]({{ adr_dir }}/) |
+| How work moves, and who decides | [`docs/process.md`](docs/process.md) |
+| Rules every agent and person follows | [`AGENTS.md`](AGENTS.md), [`CLAUDE.md`](CLAUDE.md) |
+{% if licence != 'none' %}
+## Licence
+
+{{ licence }}: see [`LICENSE`](LICENSE).
+{% endif %}

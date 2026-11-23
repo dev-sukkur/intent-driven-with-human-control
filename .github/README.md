@@ -40,13 +40,19 @@ tag, so a change here reaches projects once it is tagged (`git tag -a vX.Y.Z`, t
 | `ui_verifier_width` | `1280` | `issue-workflow` § UI route |
 | `screenshots_in_prs` | `false` | `issue-workflow` § UI route |
 | `adr_dir` | `adr` | `openspec/config.yaml`, `change-modes` |
+| `licence` — `MIT` or `none` | `MIT` | `LICENSE` |
+| `copyright_holder` | `<owner> and contributors` | `LICENSE` |
 
 Change an answer with `uvx copier update --trust --defaults --data <answer>=<value>`.
 
 What a project gets: `.agents/`, `.claude/`, `.opencode/`, `openspec/`, `AGENTS.md`,
-`CLAUDE.md`, `scripts/create-labels.sh`, `skills-lock.json`, plus `.gitignore` and
-`opencode.json` when it has none. This README, the licence and `INSTALL_TEMPLATE.md` (upstream's
-OpenCode install guide) stay here. A project adds its own rules under `## Project` at the end of `AGENTS.md`
+`CLAUDE.md`, `scripts/create-labels.sh`, `scripts/trace_requirements.py`, `skills-lock.json`,
+`.gitattributes`, and, only when it has none of its own, a starting point for each of these:
+`.gitignore`, `opencode.json`, `README.md`, `LICENSE` (the `licence` answer), `docs/process.md`
+(how work moves and who decides), `docs/pull_request_template.md`, `.github/CODEOWNERS`,
+`.github/ISSUE_TEMPLATE/work.md` and `.claude/settings.json` (an allowlist of safe, local
+commands). This README (`.github/README.md`), the template's licence and `INSTALL_TEMPLATE.md`
+(upstream's OpenCode install guide) stay here. A project adds its own rules under `## Project` at the end of `AGENTS.md`
 and in `context:` in `openspec/config.yaml`; a change to the shared process is made here, then
 pulled.
 
@@ -60,8 +66,8 @@ The process is the same in both; the answer `acceptance_stack` picks the tools.
 | Starting points copied into `acceptance-tests/` | `references/javascript/support/` | `references/python/support/`: `stack.py` (the app on its own port and database, stopped with its child processes), `auth.py` (people start signed in through the sign-in form's own post, CSRF field included), `world.py` (a browser context per person, `use_phone()`, `without_javascript()`, a screenshot of every failure), `captions.py` and `scripts/video_journey.py` (review videos) |
 | Watching and debugging | `HEADED`, `PWDEBUG`, `VIDEO`, `TRACE` | the same switches |
 | Inner tests | Bun's test runner | pytest |
-| End-of-change checks ([`outside-in-tdd`](.agents/skills/outside-in-tdd/SKILL.md) § Reconcile) | coverage with Bun, knip, `tsc --noEmit`, Stryker | pytest-cov at 100%, vulture and deptry, pyright, mutmut |
-| Test shapes | [`test-driven-development`](.agents/skills/test-driven-development/SKILL.md) references (TypeScript) | the same references, plus [`references/python.md`](.agents/skills/test-driven-development/references/python.md): pytest shapes, testing a page the server renders, hand-written JavaScript without a JavaScript toolchain |
+| End-of-change checks ([`outside-in-tdd`](../.agents/skills/outside-in-tdd/SKILL.md) § Reconcile) | coverage with Bun, knip, `tsc --noEmit`, Stryker | pytest-cov at 100%, vulture and deptry, pyright, mutmut |
+| Test shapes | [`test-driven-development`](../.agents/skills/test-driven-development/SKILL.md) references (TypeScript) | the same references, plus [`references/python.md`](../.agents/skills/test-driven-development/references/python.md): pytest shapes, testing a page the server renders, hand-written JavaScript without a JavaScript toolchain |
 
 The Python stack is checked on Windows 11 and Linux. It suits a server-rendered app (FastAPI or Django with templates, with or without HTMX) where pages work with JavaScript off; `without_javascript()` lets a scenario prove it. mutmut does not run on Windows itself: run it in CI, WSL or a Linux container.
 
@@ -69,12 +75,12 @@ The Python stack is checked on Windows 11 and Linux. It suits a server-rendered 
 
 | What | Where |
 |---|---|
-| Modes, defaults never asked, the git flow (one worktree, branch and PR per change) | [`change-modes`](.agents/skills/change-modes/SKILL.md) |
-| The build loop in build and learning modes | [`outside-in-tdd`](.agents/skills/outside-in-tdd/SKILL.md) |
-| Issues, ratings, blocked by, manager and task sessions, worktrees, the UI route | [`issue-workflow`](.agents/skills/issue-workflow/SKILL.md) |
-| Per-artifact rules: proposal, specs, design, adr, tasks | [`openspec/config.yaml.jinja`](openspec/config.yaml.jinja) |
-| Reviews and finding triage | [`AGENTS.md`](AGENTS.md) § Review guidelines |
-| The schema | [`openspec/schemas/intent-driven/`](openspec/schemas/intent-driven/), upstream's, unchanged |
+| Modes, defaults never asked, the git flow (one worktree, branch and PR per change) | [`change-modes`](../.agents/skills/change-modes/SKILL.md) |
+| The build loop in build and learning modes | [`outside-in-tdd`](../.agents/skills/outside-in-tdd/SKILL.md) |
+| Issues, ratings, blocked by, manager and task sessions, worktrees, the UI route | [`issue-workflow`](../.agents/skills/issue-workflow/SKILL.md) |
+| Per-artifact rules: proposal, specs, design, adr, tasks | [`openspec/config.yaml.jinja`](../openspec/config.yaml.jinja) |
+| Reviews and finding triage | [`AGENTS.md`](../AGENTS.md) § Review guidelines |
+| The schema | [`openspec/schemas/intent-driven/`](../openspec/schemas/intent-driven/), upstream's, unchanged |
 
 ## Sources
 
@@ -112,6 +118,9 @@ The Python stack is checked on Windows 11 and Linux. It suits a server-rendered 
 | **Reconcile at the end of each change**: coverage, unused code, types, mutation testing, with the tools of the project's stack (JavaScript or Python). Every finding is ratified into the spec, deleted, or put to the human. | Agents build more than they are asked. |
 | **`grill-me` on every planning artifact** — one decision per question, showing the text it will write. | The human settles each decision while reading the actual wording. |
 | **Adversarial authoring on Claude Code uses the Codex CLI as the reviewer** when installed, otherwise a different Claude model — only with the human's consent. | A Claude Code subagent can only run Claude models. Running it on every artifact costs more than it finds. |
+| **Who decides what**: the owner decides scope, the design, the proposal and specs, every ADR and the merge; the developer running a build approves its design and tasks; a product question the design doesn't answer goes to the owner on the issue (`change-modes` § Who decides). | Several developers build at once, each with their own agent; the owner keeps the product decisions without reviewing every internal. |
+| **Rules checked by machines where they can be**: each project convention names its check; a bug starts as a failing scenario; property-based tests for logic with many cases; complexity, length and PR-size limits; a dependency audit, and an ADR for each new dependency; a traceability report from a requirements catalogue to the specs. | Once several agents write code, a rule only a reviewer checks gets missed, and AI-written code tends to grow. |
+| **Two or three agreed push points per change**, and the acceptance suite run in pieces while building. | CI runs a few times per change; a long whole-suite run can stall an agent without a report. |
 | **Review guidelines in `AGENTS.md`**: at most 3 rounds; every finding triaged — fix now, fix if cheap or one issue, or one line under "Deliberately not handled". | Without a cap and a triage, reviews keep finding theoretical edge cases. |
 
 ---
@@ -204,7 +213,7 @@ proposal -> specs -> design -> adr -> tasks
 
 ## Schema
 
-`openspec/config.yaml` already selects the bundled [`intent-driven` schema](openspec/schemas/intent-driven/schema.yaml). Learn how to tailor artifact workflows in [OpenSpec Custom Schemas](https://intent-driven.dev/blog/2026/02/12/openspec-custom-schemas/).
+`openspec/config.yaml` already selects the bundled [`intent-driven` schema](../openspec/schemas/intent-driven/schema.yaml). Learn how to tailor artifact workflows in [OpenSpec Custom Schemas](https://intent-driven.dev/blog/2026/02/12/openspec-custom-schemas/).
 
 ## Skills
 

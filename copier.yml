@@ -22,7 +22,7 @@ _exclude:
   - .git
   - .DS_Store
   - .svn
-  - /README.md # this template's own README; the project keeps its own
+  - /.github/README.md # this template's own README; README.md.jinja is the project's starting point
   - /INSTALL_TEMPLATE.md
   - /LICENSE.md
   - /package.json
@@ -33,6 +33,13 @@ _exclude:
 _skip_if_exists:
   - .gitignore
   - opencode.json
+  - README.md
+  - LICENSE
+  - docs/process.md
+  - docs/pull_request_template.md
+  - .github/CODEOWNERS
+  - .github/ISSUE_TEMPLATE/work.md
+  - .claude/settings.json
 
 repo:
   type: str
@@ -68,6 +75,20 @@ screenshots_in_prs:
   type: bool
   help: Put the UI verifier's screenshots in PR bodies?
   default: false
+
+licence:
+  type: str
+  help: Licence for the project's LICENSE file (none writes no file)
+  choices:
+    - MIT
+    - none
+  default: MIT
+
+copyright_holder:
+  type: str
+  help: Copyright holder for the licence, for example "Jane Doe and Acme contributors"
+  when: "{{ licence != 'none' }}"
+  default: "{{ repo.split('/')[0] }} and contributors"
 
 adr_dir:
   type: str
