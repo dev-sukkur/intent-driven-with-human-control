@@ -1,4 +1,4 @@
-# Install into a project:     copier copy --trust gh:siraj-samsudeen/intent-driven-with-human-control <folder>
+# Install into a project:     copier copy --trust gh:dev-sukkur/intent-driven-with-human-control <folder>
 # Pull a newer version later:  copier update --trust      (a 3-way merge; conflicts show inline)
 # Change one answer:           copier update --trust --defaults --data <question>=<value>
 #
@@ -37,7 +37,7 @@ _skip_if_exists:
 repo:
   type: str
   help: GitHub repository, as owner/name (issues, labels and PRs go here)
-  validator: "{% if repo.count('/') != 1 or ' ' in repo %}Use owner/name, for example siraj-samsudeen/featherbase{% endif %}"
+  validator: "{% if repo.count('/') != 1 or ' ' in repo %}Use owner/name, for example acme/shop{% endif %}"
 
 extra_labels:
   type: yaml

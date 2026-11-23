@@ -1,6 +1,8 @@
 # Intent-Driven With Human Control
 
-The shared process template for all of Siraj's projects. It starts from
+A shared process template, forked from
+[siraj-samsudeen/intent-driven-with-human-control](https://github.com/siraj-samsudeen/intent-driven-with-human-control),
+which is the shared process template for Siraj's projects. That template starts from
 [intent-driven-dev/intent-driven-template](https://github.com/intent-driven-dev/intent-driven-template)
 and changes it for Claude Code, with one change of philosophy: **the human approves every step
 that has something to decide**, and the git history records each step well enough that a
@@ -18,7 +20,7 @@ Projects are linked to this template through [Copier](https://copier.readthedocs
 process improvement made here reaches every project with one command.
 
 ```bash
-uvx copier copy --trust gh:siraj-samsudeen/intent-driven-with-human-control <project-folder>
+uvx copier copy --trust gh:dev-sukkur/intent-driven-with-human-control <project-folder>
 ```
 
 ```bash
