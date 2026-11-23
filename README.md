@@ -52,6 +52,21 @@ OpenCode install guide) stay here. A project adds its own rules under `## Projec
 and in `context:` in `openspec/config.yaml`; a change to the shared process is made here, then
 pulled.
 
+## Two stacks: JavaScript and Python
+
+The process is the same in both; the answer `acceptance_stack` picks the tools.
+
+| | `javascript` | `python` |
+|---|---|---|
+| Acceptance runner | cucumber-js with Playwright | behave with Playwright, in an `acceptance-tests/` project of its own (uv) |
+| Starting points copied into `acceptance-tests/` | `references/javascript/support/` | `references/python/support/`: `stack.py` (the app on its own port and database, stopped with its child processes), `auth.py` (people start signed in through the sign-in form's own post, CSRF field included), `world.py` (a browser context per person, `use_phone()`, `without_javascript()`, a screenshot of every failure), `captions.py` and `scripts/video_journey.py` (review videos) |
+| Watching and debugging | `HEADED`, `PWDEBUG`, `VIDEO`, `TRACE` | the same switches |
+| Inner tests | Bun's test runner | pytest |
+| End-of-change checks ([`outside-in-tdd`](.agents/skills/outside-in-tdd/SKILL.md) § Reconcile) | coverage with Bun, knip, `tsc --noEmit`, Stryker | pytest-cov at 100%, vulture and deptry, pyright, mutmut |
+| Test shapes | [`test-driven-development`](.agents/skills/test-driven-development/SKILL.md) references (TypeScript) | the same references, plus [`references/python.md`](.agents/skills/test-driven-development/references/python.md): pytest shapes, testing a page the server renders, hand-written JavaScript without a JavaScript toolchain |
+
+The Python stack is checked on Windows 11 and Linux. It suits a server-rendered app (FastAPI or Django with templates, with or without HTMX) where pages work with JavaScript off; `without_javascript()` lets a scenario prove it. mutmut does not run on Windows itself: run it in CI, WSL or a Linux container.
+
 ## Where the process lives
 
 | What | Where |
@@ -86,7 +101,7 @@ pulled.
 | **The agent stops only when the stop has content** — a draft, a real decision, a prediction, a named smell. Never "say go", "shall I commit?". Formatting and tooling choices have defaults and are never asked. | A stop that only asks permission gets approved by reflex and wears down attention for the stops that matter. |
 | **Fenced Gherkin in every mode** (`spec-as-source`); the acceptance runner's own parse is the spec check (no gherkin-lint: [intent-driven-template#9](https://github.com/intent-driven-dev/intent-driven-template/issues/9)). | Specs are written the same way whatever the mode, and every scenario is tied to the test that runs it. |
 | **Spec rules**: requirements in the order a person meets them, the common case before edge cases, one example running through every scenario, scenario names that say what the user sees, an independent MECE review before approval. Proposals list capabilities in journey order, and the suite runs and records videos in that order. | Specs are read by product people. Review videos should play the way a person meets the feature. |
-| **Acceptance tooling from featherbase** (`acceptance-test-authoring`, both stacks where it is the contract): a prose scenario (no gherkin fence) is left out and named, never an error; a change's scenarios run in its proposal's capability order; no spec linter. JavaScript starting points in `references/javascript/support/`: the app boots on its own ports and refuses a second run, people start signed in through the API, and `HEADED`, `PWDEBUG`, `VIDEO` (review videos with step captions, `VIDEO_SLOWMO`, and `npm run video:journey` for one `journey.mp4`; never recorded by default) and `TRACE` (CI) switches. | Specs written before spec-as-source still run their fenced scenarios. The owner reviews a change by watching its videos in journey order. |
+| **Acceptance tooling from featherbase** (`acceptance-test-authoring`, both stacks where it is the contract): a prose scenario (no gherkin fence) is left out and named, never an error; a change's scenarios run in its proposal's capability order; no spec linter. Starting points for both stacks, in `references/javascript/support/` and `references/python/support/`: the app boots on its own ports and refuses a second run, people start signed in through the API, and `HEADED`, `PWDEBUG`, `VIDEO` (review videos with step captions, `VIDEO_SLOWMO`, and `npm run video:journey` or `scripts/video_journey.py` for one `journey.mp4`; never recorded by default) and `TRACE` (CI) switches. | Specs written before spec-as-source still run their fenced scenarios. The owner reviews a change by watching its videos in journey order. |
 | **`design.md` holds only real decisions** — a real alternative, and costly if wrong — each approved by the owner on its own. | A design padded with the spec restated hides the decisions that need judgement. |
 | **ADRs follow upstream's rule**: top-level `adr/`, never edited once accepted, superseded by a new ADR. | Nothing in the schema is patched, and an ADR's history stays readable. |
 | **One issue, one worktree, one branch, one PR per change**, from proposal to archive. The manager session stays on `main`; each issue's task session works in its own worktree with its own ports and database. Archive after the owner watches the review videos; then the owner merges with a merge commit. Replaces upstream's two-PR flow. | The owner sees a change as one unit, and the manager keeps working on `main` while workers build. |
@@ -96,7 +111,7 @@ pulled.
 | **One stop per test** — the human's prediction — with **red, green and refactor as separate commits**, and every red run committed with `Ran:`, `Predict:`, `Actual:` and `Mandates:`. | Each step can be checked out and replayed; the chain of failures shows why each package, file and stub exists. |
 | **The human predicts every red; the agent predicts only when the human says "don't know"**. Prediction accuracy sets the step size. | The human's prediction is the moment they model the system instead of watching it. |
 | **Every change is mandated by a test** — code, dependencies, files. Config no test can drive states `Breaks without it:`. | Nothing arrives that nobody needed. |
-| **Reconcile at the end of each change**: coverage, unused code, types, mutation testing. Every finding is ratified into the spec, deleted, or put to the human. | Agents build more than they are asked. |
+| **Reconcile at the end of each change**: coverage, unused code, types, mutation testing, with the tools of the project's stack (JavaScript or Python). Every finding is ratified into the spec, deleted, or put to the human. | Agents build more than they are asked. |
 | **`grill-me` on every planning artifact** — one decision per question, showing the text it will write. | The human settles each decision while reading the actual wording. |
 | **Adversarial authoring on Claude Code uses the Codex CLI as the reviewer** when installed, otherwise a different Claude model — only with the human's consent. | A Claude Code subagent can only run Claude models. Running it on every artifact costs more than it finds. |
 | **Review guidelines in `AGENTS.md`**: at most 3 rounds; every finding triaged — fix now, fix if cheap or one issue, or one line under "Deliberately not handled". | Without a cap and a triage, reviews keep finding theoretical edge cases. |

@@ -48,7 +48,7 @@ extra_labels:
 
 acceptance_stack:
   type: str
-  help: Acceptance-test stack (cucumber-js or behave)
+  help: Acceptance-test stack - javascript (cucumber-js with Playwright) or python (behave with Playwright)
   choices:
     - javascript
     - python
