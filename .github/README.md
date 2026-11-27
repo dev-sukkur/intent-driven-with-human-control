@@ -127,6 +127,8 @@ The Python stack is checked on Windows 11 and Linux. It suits a server-rendered 
 | **Operability in every proposal**: what the feature logs, measures and alerts on, with a runbook entry per alert in `docs/runbook.md`. | A product is solid when problems show and someone who didn't build it can fix them. |
 | **Releases and rollback** (`change-modes` § Releases): semver, release notes drafted from the PRs, a release checklist, and a way to undo every risky change. | Every release stays reversible. |
 | **An architecture page** (`docs/architecture.md`), C4 context and containers, updated by any change that adds or removes a service, store or outside system. | A newcomer sees the whole system on one page. |
+| **Fast feedback through agent hooks**: Claude Code formats and lints each file an agent edits, right after the edit (`.claude/settings.json`, `.claude/hooks/`), and shows the agent what is left to fix. | Problems are fixed in seconds, not at the end-of-change checks. |
+| **A UI quality bar**: an automatic accessibility check (axe, WCAG 2.1 AA) on every page a scenario opens, keyboard-only use in the verifier's checks, and a response-time budget a spec can set (`support/quality` in both packs). | Accessibility and speed are checked every run, not remembered now and then. |
 | **Two or three agreed push points per change**, and the acceptance suite run in pieces while building. | CI runs a few times per change; a long whole-suite run can stall an agent without a report. |
 | **Review guidelines in `AGENTS.md`**: at most 3 rounds; every finding triaged — fix now, fix if cheap or one issue, or one line under "Deliberately not handled". | Without a cap and a triage, reviews keep finding theoretical edge cases. |
 

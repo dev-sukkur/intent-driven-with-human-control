@@ -32,5 +32,22 @@
       "Bash(npx cucumber-js:*)"
 {%- endif %}
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+{%- if acceptance_stack == 'python' %}
+            "command": "uv run --no-project python .claude/hooks/format_edited_file.py"
+{%- else %}
+            "command": "node .claude/hooks/format-edited-file.mjs"
+{%- endif %}
+          }
+        ]
+      }
+    ]
   }
 }
