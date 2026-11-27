@@ -50,7 +50,7 @@ What a project gets: `.agents/`, `.claude/`, `.opencode/`, `openspec/`, `AGENTS.
 `.gitattributes`, and, only when it has none of its own, a starting point for each of these:
 `.gitignore`, `opencode.json`, `README.md`, `LICENSE` (the `licence` answer), `docs/process.md`
 (how work moves and who decides), `docs/pull_request_template.md`, `.github/CODEOWNERS`,
-`.github/ISSUE_TEMPLATE/work.md` and `.claude/settings.json` (an allowlist of safe, local
+`.github/ISSUE_TEMPLATE/work.md`, `.github/workflows/ci.yml` and `mutation.yml` (every check the template names, for the project's stack), `.github/dependabot.yml`, and `.claude/settings.json` (an allowlist of safe, local
 commands). This README (`.github/README.md`), the template's licence and `INSTALL_TEMPLATE.md`
 (upstream's OpenCode install guide) stay here. A project adds its own rules under `## Project` at the end of `AGENTS.md`
 and in `context:` in `openspec/config.yaml`; a change to the shared process is made here, then

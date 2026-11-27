@@ -1,0 +1,129 @@
+{% raw %}# The checks every change passes, from the process template (a starting point:
+# edit it for this project). Every action pinned to its full commit id, a
+# read-only token, no secrets.
+# A project with a database adds a `services:` block (for example postgres) to
+# the jobs that need it, and its address under `env:`.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A newer push cancels the older run on the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  FORCE_COLOR: "1"
+
+jobs:
+  # Format, lint (with the maintainable-code rules in pyproject.toml), types,
+  # unused code and unused dependencies.
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/uv.lock"
+      - run: uv sync --locked
+      - run: uv run ruff format --check .
+      - run: uv run ruff check .
+      - run: uv run pyright
+      - run: uv run vulture
+      - run: uv run deptry .
+
+  # The inner tests, with the coverage threshold set in pyproject.toml (100%).
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/uv.lock"
+      - run: uv sync --locked
+      - run: uv run pytest
+
+  # The acceptance suite (the acceptance-test-authoring skill), with its report,
+  # screenshots and traces kept for download.
+  acceptance:
+    name: Acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/uv.lock"
+      - run: uv sync --locked
+      - run: uv sync --locked --project acceptance-tests
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('acceptance-tests/uv.lock') }}
+      - run: uv run --project acceptance-tests playwright install --with-deps chromium
+      - run: uv run --project acceptance-tests python acceptance-tests/run_acceptance.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: acceptance-reports
+          path: acceptance-tests/reports/
+          if-no-files-found: warn
+
+  # The specs are valid OpenSpec, and every scenario extracts.
+  specs:
+    name: Specs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - run: npx --yes @fission-ai/openspec@2.0.0 validate --specs --no-interactive
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/uv.lock"
+      - run: uv run --locked --project acceptance-tests python acceptance-tests/run_acceptance.py --print-locations
+      # The requirements no spec names yet: a report, not a check
+      # (add --strict once every requirement is covered).
+      - if: ${{ hashFiles('docs/requirements.md') != '' }}
+        run: python3 scripts/trace_requirements.py docs/requirements.md
+
+  # Known vulnerabilities in the locked dependencies (change-modes § Defaults).
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+      - run: uv export --frozen --format requirements-txt --no-emit-project -o "$RUNNER_TEMP/requirements.txt"
+      - run: uvx pip-audit --disable-pip --require-hashes -r "$RUNNER_TEMP/requirements.txt"
+{% endraw %}

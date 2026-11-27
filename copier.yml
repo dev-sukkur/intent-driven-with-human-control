@@ -40,6 +40,9 @@ _skip_if_exists:
   - .github/CODEOWNERS
   - .github/ISSUE_TEMPLATE/work.md
   - .claude/settings.json
+  - .github/workflows/ci.yml
+  - .github/workflows/mutation.yml
+  - .github/dependabot.yml
 
 repo:
   type: str
