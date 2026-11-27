@@ -1,0 +1,54 @@
+{% raw %}# The weekly mutation report on main, from the process template: a report to
+# read (outside-in-tdd § Reconcile), not a check that blocks. Every surviving
+# mutant is a missing test or code nobody needs.
+name: Mutation
+
+on:
+  schedule:
+    - cron: "17 3 * * 1" # Mondays, 03:17 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    name: Mutation report
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+{% endraw %}{% if acceptance_stack == 'python' %}{% raw %}      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/uv.lock"
+      - run: uv sync --locked
+      # mutmut reads [tool.mutmut] in pyproject.toml; it runs on Linux only.
+      - run: uv run --with mutmut==3.8.1 mutmut run
+      - name: Report
+        if: ${{ !cancelled() }}
+        run: |
+          {
+            echo "## Mutation report"
+            echo '```'
+            uv run --with mutmut==3.8.1 mutmut results
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+{% endraw %}{% else %}{% raw %}      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+      - run: bun install --frozen-lockfile
+      # Stryker reads its config file (outside-in-tdd § Tooling gotchas, Bun).
+      - run: bunx stryker run
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: mutation-report
+          path: reports/mutation/
+          if-no-files-found: warn
+{% endraw %}{% endif %}

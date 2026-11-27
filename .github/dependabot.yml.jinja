@@ -1,0 +1,48 @@
+# Dependency updates, from the process template: weekly, one grouped PR per kind.
+# A release is proposed only once it is a week old (cooldown), so a bad one has
+# time to be pulled. GitHub's security alerts still arrive at once.
+version: 2
+updates:
+{%- if acceptance_stack == 'python' %}
+  # The uv project and the acceptance suite's own project.
+  - package-ecosystem: uv
+    directories: ["/", "/acceptance-tests"]
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      packages:
+        patterns: ["*"]
+{%- else %}
+  - package-ecosystem: bun
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      packages:
+        patterns: ["*"]
+
+  # The acceptance suite's own project.
+  - package-ecosystem: npm
+    directory: /acceptance-tests
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      acceptance:
+        patterns: ["*"]
+{%- endif %}
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]

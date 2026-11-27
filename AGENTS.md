@@ -8,6 +8,8 @@
   task sessions and worktrees, the UI route).
 - Code is written to the `maintainable-code` skill: as simple as the tests allow, readable by a
   person new to it, and every file and every function says what it is for.
+- A change is done when the `change-modes` skill's § Definition of Done holds. A change that
+  touches sign-in, permissions, data or input follows the `security-baseline` skill.
 - Who decides what is in the `change-modes` skill, § Who decides. A product question the agreed
   design does not answer goes to the owner as a comment on the issue, never decided in code.
 
