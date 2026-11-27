@@ -62,6 +62,9 @@ JavaScript and TypeScript) of two to six lines:
 Don't restate the code ("increments i"). Don't describe how it used to work. Keep it short: a
 one-line description is right for most functions.
 
+An `__init__` that only takes and keeps its arguments, and a standard method such as `__repr__`,
+need no description of their own: the class's description covers them.
+
 A test's name says the behaviour it proves, so a test function needs no description of its own;
 a test file's description names what it tests and, where there is one, the spec it follows.
 
@@ -120,7 +123,7 @@ These run with the end-of-change checks (`outside-in-tdd` § Reconcile) and in C
 
 | Rule | Python (ruff) | JavaScript / TypeScript (eslint) |
 |---|---|---|
-| Every file, class and function has a description | `D` (pydocstyle) with `convention = "google"`, so a first line may say what comes back; `D1` reports a public file, class or function without one; tests exempt from `D103` | `jsdoc/require-jsdoc` (eslint-plugin-jsdoc) for functions and classes |
+| Every file, class and function has a description | `D` (pydocstyle) with `convention = "google"`, so a first line may say what comes back; `D1` reports a public file, class or function without one; `D105` and `D107` off (the class covers them); tests exempt from `D103` | `jsdoc/require-jsdoc` (eslint-plugin-jsdoc) for functions and classes |
 | Complexity per function | `C90`, `max-complexity = 10` | `complexity: 10` |
 | Branches, statements, parameters | `PLR0912`, `PLR0915`, `PLR0913` (`max-args = 4`) | `max-depth: 3`, `max-lines-per-function: 40`, `max-params: 4`, `max-lines: 400` |
 | No swallowed errors | `BLE`, `S110`, `E722` | `no-empty` |
