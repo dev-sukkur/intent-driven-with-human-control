@@ -96,6 +96,21 @@ A change is done when every line holds. The PR template repeats this list as che
 - [ ] The change is archived as the branch's last commit, and the PR body lists what was
       deliberately not handled.
 
+## Releases
+
+- **Versions by meaning** (semver): the major number goes up when a user or an integration must
+  change something (a removed option, an incompatible API, a data change they must act on); the
+  minor for a new feature; the patch for a fix. Label such a PR `breaking`.
+- **Release notes** are drafted from the merged PRs' titles and labels
+  (`.github/release-drafter.yml`, `.github/workflows/release.yml`); a PR title is written for
+  the person who reads the notes.
+- **The release checklist**, before the owner publishes: every change in it meets the
+  Definition of Done; CI is green on `main`; the upgrade is tried on a copy of the last release's
+  data; the notes say what a user must do, if anything; the runbook covers every new alert.
+- **Every risky change can be undone.** Its `design.md` says how: a feature flag that turns it
+  off, or a data change that only adds (new tables, optional columns), so the previous version
+  still runs on the new data. Removing or renaming waits for a later release.
+
 ## Continuing — overrides the openspec-* skills
 
 When an `openspec-*` skill ends a step by asking whether to continue ("STOP and wait for user

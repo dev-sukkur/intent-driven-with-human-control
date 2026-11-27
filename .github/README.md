@@ -50,7 +50,7 @@ What a project gets: `.agents/`, `.claude/`, `.opencode/`, `openspec/`, `AGENTS.
 `.gitattributes`, and, only when it has none of its own, a starting point for each of these:
 `.gitignore`, `opencode.json`, `README.md`, `LICENSE` (the `licence` answer), `docs/process.md`
 (how work moves and who decides), `docs/pull_request_template.md`, `.github/CODEOWNERS`,
-`.github/ISSUE_TEMPLATE/work.md`, `.github/workflows/ci.yml` and `mutation.yml` (every check the template names, for the project's stack), `.github/dependabot.yml`, and `.claude/settings.json` (an allowlist of safe, local
+`.github/ISSUE_TEMPLATE/work.md`, `.github/workflows/ci.yml` and `mutation.yml` (every check the template names, for the project's stack), `.github/dependabot.yml`, release notes drafted from the merged PRs (`.github/release-drafter.yml` and `.github/workflows/release.yml`), `docs/runbook.md`, `docs/architecture.md`, and `.claude/settings.json` (an allowlist of safe, local
 commands). This README (`.github/README.md`), the template's licence and `INSTALL_TEMPLATE.md`
 (upstream's OpenCode install guide) stay here. A project adds its own rules under `## Project` at the end of `AGENTS.md`
 and in `context:` in `openspec/config.yaml`; a change to the shared process is made here, then
@@ -124,6 +124,9 @@ The Python stack is checked on Windows 11 and Linux. It suits a server-rendered 
 | **A Definition of Done** in one place (`change-modes`), repeated as checkboxes in the PR template. | Done was spread over four skills; one list means no step is skipped. |
 | **A security baseline** (`security-baseline`): a short threat check in `design.md` and a checklist (permissions denied by default, input checked at the edge, output escaped, sessions, forged requests, headers, secrets, limits, redirects, audit) for any change that touches sign-in, permissions, data or input. | Security is designed in, not reviewed in at the end. |
 | **Tests that never flake**: no sleeping, the clock and random numbers injected, each test owns its data; a flaky test is fixed or quarantined the same day. Outside systems get a fake and a scheduled contract test. | A suite people stop trusting gets ignored. |
+| **Operability in every proposal**: what the feature logs, measures and alerts on, with a runbook entry per alert in `docs/runbook.md`. | A product is solid when problems show and someone who didn't build it can fix them. |
+| **Releases and rollback** (`change-modes` § Releases): semver, release notes drafted from the PRs, a release checklist, and a way to undo every risky change. | Every release stays reversible. |
+| **An architecture page** (`docs/architecture.md`), C4 context and containers, updated by any change that adds or removes a service, store or outside system. | A newcomer sees the whole system on one page. |
 | **Two or three agreed push points per change**, and the acceptance suite run in pieces while building. | CI runs a few times per change; a long whole-suite run can stall an agent without a report. |
 | **Review guidelines in `AGENTS.md`**: at most 3 rounds; every finding triaged — fix now, fix if cheap or one issue, or one line under "Deliberately not handled". | Without a cap and a triage, reviews keep finding theoretical edge cases. |
 
