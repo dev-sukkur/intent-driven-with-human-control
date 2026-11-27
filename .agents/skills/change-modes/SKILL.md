@@ -63,6 +63,8 @@ Formatting and tooling choices are not questions for the human:
   numbered after the highest existing one. An accepted ADR is never edited; a new ADR supersedes
   it.
 - Acceptance-test stack: `stack:` in `openspec/config.yaml` (`acceptance_stack` in the answers).
+- Code style: the `maintainable-code` skill (simplicity, names, a description on every file
+  and function, structure, errors, types), with its checks in the linter's configuration.
 - Simplicity limits: a complexity limit per function (ruff `C90`, eslint `complexity`, both at
   10), a length limit per function and per file set from the project's own code, and a soft
   limit of about 600 changed lines of code per PR, tests, specs and migrations aside. An
