@@ -76,6 +76,26 @@ Formatting and tooling choices are not questions for the human:
 - Traceability: when the project keeps a requirements catalogue, a spec names the catalogue
   IDs it covers, and `scripts/trace_requirements.py` lists the IDs no spec names.
 
+## Definition of Done
+
+A change is done when every line holds. The PR template repeats this list as checkboxes.
+
+- [ ] Every scenario of the change passes, with no pending or undefined step.
+- [ ] Every end-of-change check is clean (`outside-in-tdd` § Reconcile): coverage, unused code,
+      types, complexity, descriptions, the dependency audit.
+- [ ] Every new or changed file, class and function has a true description (`maintainable-code`).
+- [ ] A change that touches sign-in, permissions, data or input has its threat check, and the
+      checklist holds (`security-baseline`).
+- [ ] The review is done and its findings triaged, in at most three rounds; for UI, the
+      independent verifier's checklist passes.
+- [ ] What the change logs, measures and alerts on is in place, with its runbook entry
+      (`openspec/config.yaml`, proposal rules).
+- [ ] Docs that the change makes untrue are updated: the README, `docs/architecture.md`,
+      `docs/runbook.md`, the deployment guide.
+- [ ] The owner has watched the review videos.
+- [ ] The change is archived as the branch's last commit, and the PR body lists what was
+      deliberately not handled.
+
 ## Continuing — overrides the openspec-* skills
 
 When an `openspec-*` skill ends a step by asking whether to continue ("STOP and wait for user
